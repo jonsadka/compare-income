@@ -1,7 +1,6 @@
 var maxCount = 0;
 var totalCount = 0;
 var incomeThresholds = [];
-var DEFAULT_SALARY = 12345;
 var typPadding = 2;
 
 // ADD PAGE ELEMENTS
@@ -50,20 +49,17 @@ function formatCSVData(irsCsv, index){
 }
 
 function processData(err, irsData){
-  console.log(irsData)
   incomeThresholds = irsData;
 
-  updateD3Functions(irsData);
+  xScale.domain([0, irsData.length - 1]);
+  yScale.domain([0, maxCount * 1.2]);
+
   initialRender(irsData)
 }
 
-function updateD3Functions(irsData){
-  xScale.domain([0, irsData.length - 1]);
-  yScale.domain([0, maxCount * 1.2]);
-}
-
 function initialRender(irsData){
-  var salaryStats = calculateSalaryStats(DEFAULT_SALARY);
+  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim() || 100000;
+  var salaryStats = calculateSalaryStats(userSalary);
   var description = getDescription(salaryStats);
   var salaryXPos = xScale(salaryStats.index);
 
@@ -242,4 +238,25 @@ function getDescription(salaryStats){
     percent = Math.round(salaryStats.percentage * 100);
   }
   return ['of Americans earned','less than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
+}
+
+function updateSalary(){
+  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
+  var salaryStats = calculateSalaryStats(userSalary);
+  var description = getDescription(salaryStats);
+  var salaryXPos = xScale(salaryStats.index);
+
+  d3.selectAll('.salary.circle')
+    .transition().duration(1000)
+    .attr({
+      'r': salaryXPos/2,
+      'cx': salaryXPos/2 + margin.left
+    })
+
+  d3.selectAll('.cover.salary')
+    .transition().duration(1000)
+    .attr({
+      'width': salaryXPos
+    })
+
 }
