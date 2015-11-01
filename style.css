@@ -1,0 +1,26 @@
+* {
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 10px Helvetica;
+  color: #868174;
+}
+
+#chart {
+  width: 100%;
+}
+
+.flag.label {
+  text-anchor: end;
+}
+
+
+
+/*FOR TESTING*/
+svg {
+  background-color: RGBA(255, 192, 203, 0.2);
+}
