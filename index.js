@@ -24,15 +24,10 @@ var yScale = d3.scale.linear().range([chartDimension / 2, 0]);
 //   .x(function(d){return xScale( getIncomeIndex(d.income) )})
 //   .y(function(d){return yScale(d.count);})
 
-// var area = d3.svg.area().interpolate('cardinal')
-//   .x(function(d){ return xScale(d.index || d.originalIndex);})
-//   .y0((maxWindowDim - margin.top - margin.bottom)/2 + 0.5)
-//   .y1(function(d){ return yScale(d.citizens); });
-
-// var salaryArea = d3.svg.area().interpolate('cardinal')
-//   .x(function(d){return xScale(d.index);})
-//   .y0((maxWindowDim - margin.top - margin.bottom)/2 + 0.5)
-//   .y1(function(d){ return yScale(d.citizens); });
+var area = d3.svg.area().interpolate('cardinal')
+  .x(function(d){return xScale(d.originalIndex);})
+  .y0(0)
+  .y1(function(d){return yScale(d.count);})
 
 d3.csv('data.csv', formatCSVData, processData);
 
@@ -44,7 +39,7 @@ function formatCSVData(IrsCsv, index){
   var lowerThreshold = +threshold[0].slice(1).split(',').join('');
   var upperThreshold = +threshold[1].slice(1).split(',').join('');
   return {
-    text: IrsCsv.range,
+    text: IrsCsv.range.split(' to ')[0],
     lowerThreshold: lowerThreshold,
     upperThreshold: upperThreshold || Infinity,
     count: +IrsCsv.count,
@@ -88,11 +83,10 @@ function initialRender(irsData){
     .append('circle')
       .attr({
         'class': 'salary circle',
-        'fill': 'red',
-        'r': function(d){return xScale(6.9)/2;},
-        'cx': function(d){return xScale(6.9)/2;},
-        'cy': chartDimension/2,
-        'opacity': 0.20
+        'fill': 'RGBA(0, 140, 112, ' + (0.5 + 0.5 * 0.3) + ')',
+        'r': function(d){return xScale(16.9)/2;},
+        'cx': function(d){return xScale(16.9)/2;},
+        'cy': chartDimension/2
       })
 
   d3.select('#chart-container')
@@ -123,20 +117,17 @@ function initialRender(irsData){
         'class': 'cover salary',
         'x': 0,
         'y': 0,
-        'width': function(d){return xScale(6.9);},
+        'width': function(d){return xScale(16.9);},
         'height': chartDimension / 2,
         'fill': 'RGBA(0, 140, 112, 0.5)'
       })
 
   d3.select('#chart-container')
-    .append('rect')
+    .append('path').datum(irsData)
       .attr({
         'class': 'area outline',
-        'x': 0,
-        'y': 0,
-        'width': function(d){return xScale(6.9);},
-        'height': chartDimension / 2,
-        'fill': 'RGBA(0, 140, 112, 0.5)'
+        'd': area,
+        'fill': 'white'
       })
 
   var flags = d3.select('#chart-container')
