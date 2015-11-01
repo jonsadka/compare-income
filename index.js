@@ -20,7 +20,7 @@ var svg = d3.select('#chart').append('svg')
     .attr('transform', 'translate(' + leftAdjust + ',' + topAdjust + ')');
 
 // SETUP THE D3 EQUATIONS
-var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var margin = {top: 20, right: 30, bottom: 20, left: 30};
 var xScale = d3.scale.linear().range([0, chartDimension - margin.right - margin.left]);
 var yScale = d3.scale.linear().range([chartDimension / 2, 0]);
 
@@ -56,10 +56,10 @@ function processData(err, irsData){
   xScale.domain([0, irsData.length - 1]);
   yScale.domain([0, maxCount * 1.2]);
 
-  initialRender(irsData)
+  initialRender()
 }
 
-function initialRender(irsData){
+function initialRender(){
   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim() || 100000;
   var salaryStats = calculateSalaryStats(userSalary);
   var description = getDescription(salaryStats);
@@ -73,7 +73,7 @@ function initialRender(irsData){
         'stroke': 'RGBA(186, 184, 175, 1)',
         'stroke-width': 1
       })
-      .selectAll('.outline .circle').data(irsData).enter()
+      .selectAll('.outline .circle').data(incomeThresholds).enter()
       .append('circle')
         .attr({
           'class': 'outline circle',
@@ -127,7 +127,7 @@ function initialRender(irsData){
       })
 
   d3.select('#chart-container')
-    .append('path').datum(irsData)
+    .append('path').datum(incomeThresholds)
       .attr({
         'class': 'area outline',
         'd': area,
@@ -171,7 +171,8 @@ function initialRender(irsData){
     .append('g')
       .attr({
         'class': 'flags',
-        'stroke': 'RGBA(186, 184, 175, 1)',
+        'stroke': 'RGBA(186, 184, 175, 0.25)',
+        'fill': 'RGBA(186, 184, 175, 0.75)',
         'stroke-width': 1
       })
 
@@ -179,10 +180,9 @@ function initialRender(irsData){
     .append('g')
       .attr({
         'class': 'flags lines',
-        'stroke': 'RGBA(186, 184, 175, 1)',
         'stroke-width': 1
       })
-      .selectAll('.flag.line').data(irsData).enter()
+      .selectAll('.flag.line').data(incomeThresholds).enter()
       .append('line')
         .attr({
           'class': 'flag line',
@@ -197,10 +197,9 @@ function initialRender(irsData){
       .attr({
         'class': 'flags labels',
         'stroke': 'none',
-        'fill': 'RGBA(186, 184, 175, 0.45)',
         'font-size': 12
       })
-      .selectAll('.flag.label').data(irsData).enter()
+      .selectAll('.flag.label').data(incomeThresholds).enter()
       .append('text')
         .text(function(d){return d.text;})
         .attr({
@@ -293,7 +292,6 @@ function updateElements(){
   var salaryStats = calculateSalaryStats(userSalary);
   var description = getDescription(salaryStats);
   var salaryXPos = xScale(salaryStats.index);
-  console.log(xScale(1))
 
   d3.selectAll('.outline .circle').data(incomeThresholds)
     .transition()
@@ -326,6 +324,7 @@ function updateElements(){
     })
 
   d3.selectAll('.cover.salary')
+    .transition()
     .attr({
       'width': salaryXPos,
       'height': chartDimension / 2 - margin.top
@@ -356,6 +355,7 @@ function updateElements(){
     })
 
   d3.selectAll('.flag.line').data(incomeThresholds)
+    .transition()
     .attr({
       'x1': function(d){return xScale(d.originalIndex) + margin.left;},
       'x2': function(d){return xScale(d.originalIndex) + margin.left;},
@@ -367,7 +367,6 @@ function updateElements(){
     .attr({
       'transform': function(d){return 'translate('+ (xScale(d.originalIndex) + margin.left) +',' + (0 + margin.top) + ')rotate(-90)';}
     })
-
 }
 
 function updateWindow(){
@@ -392,5 +391,4 @@ function updateWindow(){
   yScale.range([chartDimension / 2, 0]);
 
   updateElements();
-  // updateSalary();
 }
