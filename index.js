@@ -138,8 +138,7 @@ function initialRender(irsData){
         'class': 'descriptions',
       })
 
-  var percentageTextSize = 36;
-  var textTextSize = 14;
+  var percentageTextSize = calculateFontSize(userSalary);
   descriptions
     .append('text')
       .text(description[2])
@@ -152,6 +151,7 @@ function initialRender(irsData){
         'fill': 'white'
       })
 
+  var textTextSize = 14;
   descriptions.selectAll('.description.text').data(description.slice(0,2)).enter()
     .append('text')
       .text(function(d){return d;})
@@ -240,6 +240,11 @@ function getDescription(salaryStats){
   return ['of Americans earned','less than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
 }
 
+function calculateFontSize(userSalary){
+  var calculatedSize = Math.max(6, userSalary/13000 * 36);
+  return Math.min(calculatedSize, 36)
+}
+
 function updateSalary(){
   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
   var salaryStats = calculateSalaryStats(userSalary);
@@ -259,4 +264,23 @@ function updateSalary(){
       'width': salaryXPos
     })
 
+  var percentageTextSize = calculateFontSize(userSalary);
+  d3.selectAll('.description.percentage')
+    .text(description[2])
+    .transition().duration(1000)
+    .attr({
+      'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
+      'font-size': percentageTextSize
+    })
+
+  var textTextSize = 14;
+  d3.selectAll('.description.text').data(description.slice(0,2))
+    .text(function(d){return d;})
+    .transition().duration(1000)
+    .attr({
+      'font-size': textTextSize,
+      'transform': function(d, i){
+        return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
+      }
+    })
 }
