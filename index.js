@@ -1,8 +1,8 @@
 var maxCount = 0;
 var totalCount = 0;
 var incomeThresholds = [];
-var DEFAULT_SALARY = 300000;
-var typPadding = 4;
+var DEFAULT_SALARY = 12345;
+var typPadding = 2;
 
 // ADD PAGE ELEMENTS
 var upperContainer = document.getElementById('upper-content');
@@ -72,7 +72,7 @@ function initialRender(irsData){
       .attr({
         'class': 'outline circles',
         'fill': 'none',
-        'stroke': '#bab8af',
+        'stroke': 'RGBA(186, 184, 175, 1)',
         'stroke-width': 1
       })
       .selectAll('.outline .circle').data(irsData).enter()
@@ -173,7 +173,7 @@ function initialRender(irsData){
     .append('g')
       .attr({
         'class': 'flags',
-        'stroke': '#bab8af',
+        'stroke': 'RGBA(186, 184, 175, 1)',
         'stroke-width': 1
       })
 
@@ -181,7 +181,7 @@ function initialRender(irsData){
     .append('g')
       .attr({
         'class': 'flags lines',
-        'stroke': '#bab8af',
+        'stroke': 'RGBA(186, 184, 175, 1)',
         'stroke-width': 1
       })
       .selectAll('.flag.line').data(irsData).enter()
@@ -191,13 +191,16 @@ function initialRender(irsData){
           'x1': function(d){return xScale(d.originalIndex) + margin.left;},
           'x2': function(d){return xScale(d.originalIndex) + margin.left;},
           'y1': 0 + margin.top,
-          'y2': function(d){return yScale(d.count) - 15;}
+          'y2': function(d){return Math.max(yScale(d.count) - 15, 0.8 * yScale(d.count));}
         })
 
   flags
     .append('g')
       .attr({
         'class': 'flags labels',
+        'stroke': 'none',
+        'fill': 'RGBA(186, 184, 175, 0.45)',
+        'font-size': 12
       })
       .selectAll('.flag.label').data(irsData).enter()
       .append('text')
