@@ -2,6 +2,7 @@ var maxCount = 0;
 var totalCount = 0;
 var incomeThresholds = [];
 var DEFAULT_SALARY = 300000;
+var typPadding = 4;
 
 // ADD PAGE ELEMENTS
 var upperContainer = document.getElementById('upper-content');
@@ -141,14 +142,17 @@ function initialRender(irsData){
         'class': 'descriptions',
       })
 
+  var percentageTextSize = 36;
+  var textTextSize = 14;
   descriptions
     .append('text')
       .text(description[2])
       .attr({
         'class': 'description percentage',
         'text-anchor': 'end',
-        'transform': 'translate(' + (salaryXPos + margin.right) + ',' + (chartDimension / 2 + margin.top) + ')',
-        'font-size': 36,
+        'alignment-baseline': 'after-edge',
+        'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
+        'font-size': percentageTextSize,
         'fill': 'white'
       })
 
@@ -157,9 +161,10 @@ function initialRender(irsData){
       .text(function(d){return d;})
       .attr({
         'class': 'description text',
-        'font-size': 16,
+        'font-size': textTextSize,
+        'alignment-baseline': 'after-edge',
         'transform': function(d, i){
-          return 'translate(' + (salaryXPos + margin.right) + ',' + (chartDimension / 2 + margin.top + i * 28) + ')'
+          return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
         },
         'fill': '#868174'
       })
