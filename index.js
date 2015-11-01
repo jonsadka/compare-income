@@ -49,9 +49,8 @@ function formatCSVData(irsCsv, index){
 }
 
 function processData(err, irsData){
-  incomeThresholds = irsData;
-  console.log(totalCount)
   console.log(irsData)
+  incomeThresholds = irsData;
 
   updateD3Functions(irsData);
   initialRender(irsData)
@@ -63,6 +62,10 @@ function updateD3Functions(irsData){
 }
 
 function initialRender(irsData){
+  var salaryStats = calculateSalaryStats(DEFAULT_SALARY);
+  var description = getDescription(salaryStats);
+  var salaryXPos = xScale(salaryStats.index);
+
   d3.select('#chart-container')
     .append('g')
       .attr({
@@ -86,8 +89,8 @@ function initialRender(irsData){
       .attr({
         'class': 'salary circle',
         'fill': 'RGBA(0, 140, 112, ' + (0.5 + 0.5 * 0.3) + ')',
-        'r': function(d){return xScale( calculateSalaryStats(DEFAULT_SALARY).index )/2;},
-        'cx': function(d){return xScale( calculateSalaryStats(DEFAULT_SALARY).index )/2 + margin.left;},
+        'r': salaryXPos/2,
+        'cx': salaryXPos/2 + margin.left,
         'cy': chartDimension/2
       })
 
@@ -119,7 +122,7 @@ function initialRender(irsData){
         'class': 'cover salary',
         'x': 0 + margin.left,
         'y': 0 + margin.top,
-        'width': function(d){return xScale( calculateSalaryStats(DEFAULT_SALARY).index );},
+        'width': salaryXPos,
         'height': chartDimension / 2 - margin.top,
         'fill': 'RGBA(0, 140, 112, 0.5)'
       })
@@ -130,6 +133,35 @@ function initialRender(irsData){
         'class': 'area outline',
         'd': area,
         'fill': 'white'
+      })
+
+  var descriptions = d3.select('#chart-container')
+    .append('g')
+      .attr({
+        'class': 'descriptions',
+      })
+
+  descriptions
+    .append('text')
+      .text(description[2])
+      .attr({
+        'class': 'description percentage',
+        'text-anchor': 'end',
+        'transform': 'translate(' + (salaryXPos + margin.right) + ',' + (chartDimension / 2 + margin.top) + ')',
+        'font-size': 36,
+        'fill': 'white'
+      })
+
+  descriptions.selectAll('.description.text').data(description.slice(0,2)).enter()
+    .append('text')
+      .text(function(d){return d;})
+      .attr({
+        'class': 'description text',
+        'font-size': 16,
+        'transform': function(d, i){
+          return 'translate(' + (salaryXPos + margin.right) + ',' + (chartDimension / 2 + margin.top + i * 28) + ')'
+        },
+        'fill': '#868174'
       })
 
   var flags = d3.select('#chart-container')
@@ -168,13 +200,12 @@ function initialRender(irsData){
         .attr({
           'class': 'flag label',
           'dy': '0.9em',
+          'text-anchor': 'end',
           'transform': function(d){return 'translate('+ (xScale(d.originalIndex) + margin.left) +',' + (0 + margin.top) + ')rotate(-90)';}
         })
 }
 
-
 function calculateSalaryStats(userSalary){
-  // var result = {index: 123, percentage: .53};
   for (var i = 0; i < incomeThresholds.length; i++){
     var threshold = incomeThresholds[i];
     if (userSalary < threshold.upperThreshold) {
@@ -182,16 +213,25 @@ function calculateSalaryStats(userSalary){
       var calculatedIndex = i + factor;
       var calculatedCumulCount = threshold.cumulCount - factor * threshold.count
 
-      console.log(calculatedCumulCount / totalCount)
-      return {index: calculatedIndex, percentage: calculatedCumulCount / totalCount}
-    //   var citizenChange = factor*(threshold.citizens - threshold.citizens);
-    //   result.push({
-    //     income: userSalary,
-    //     citizens: threshold.citizens + citizenChange,
-    //     index: threshold.index + factor,
-    //     cumulCitizens: threshold.cumulCitizens + Math.abs(citizenChange)
-    //   });
+      return {
+          userSalary: userSalary,
+          index: calculatedIndex,
+          percentage: calculatedCumulCount / totalCount
+        }
     };
   }
   return {};
+}
+
+function getDescription(salaryStats){
+  var format = d3.format('$,');
+  var percent = Math.round(salaryStats.percentage * 10000)/100;
+  if (percent > 98){
+    percent = Math.round(salaryStats.percentage * 10000)/100;
+  } else if (percent > 95){
+    percent = Math.round(salaryStats.percentage * 1000)/10;
+  } else {
+    percent = Math.round(salaryStats.percentage * 100);
+  }
+  return ['of Americans earned','less than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
 }
