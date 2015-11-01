@@ -5,6 +5,17 @@
   padding: 0;
 }
 
+h1 {
+  font-family: 'Hoefler Text', Georgia, 'Times New Roman', serif;
+  font-weight: normal;
+  font-size: 1.75em;
+  letter-spacing: .2em;
+  line-height: 1.1em;
+  margin: 0px;
+  /*text-align: center;*/
+  text-transform: uppercase;
+}
+
 body {
   font: 10px Helvetica;
   font-family: Helvetica, sans-serif;

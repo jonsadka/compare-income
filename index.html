@@ -7,10 +7,14 @@
   </head>
   <body>
     <div id="upper-content">
-      INCOME DISTRIBUTION
-      $<input id="usersalary" placeholder="input your salary" onkeyup="updateSalary()" onmousedown="updateSalary()" value="29,500" onmouseup="updateSalary()" type="text">
+      <h1>Income distribution</h1>
+      Input your salary: $<input id="usersalary" placeholder="input your salary" onkeyup="updateSalary()" onmousedown="updateSalary()" value="10,000" onmouseup="updateSalary()" type="text">
     </div>
     <div id="chart"></div>
+    <div id="bottom-content">
+      <p>Data source: IRS, Statistics of Income—Individual Income Tax Returns, 2013.</p>
+      <p>Total: 147,351,299 individual income tax returns in 2013.</p>
+    </div>
     <!-- SCRIPTS -->
     <script type="text/javascript" src="node_modules/d3/d3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="index.js" charset="utf-8"></script>

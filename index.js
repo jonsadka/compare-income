@@ -5,9 +5,10 @@ var typPadding = 2;
 
 // ADD PAGE ELEMENTS
 var upperContainer = document.getElementById('upper-content');
+var bottomContainer = document.getElementById('bottom-content');
 var chartContainer = document.getElementById('chart');
 var width = chartContainer.offsetWidth;
-var height = window.innerHeight - upperContainer.offsetHeight;
+var height = window.innerHeight - upperContainer.offsetHeight - bottomContainer.offsetHeight;
 
 var chartDimension = Math.min(width, height);
 var leftAdjust = Math.max(0, (width - chartDimension)/2);
@@ -20,14 +21,20 @@ var svg = d3.select('#chart').append('svg')
     .attr('transform', 'translate(' + leftAdjust + ',' + topAdjust + ')');
 
 // SETUP THE D3 EQUATIONS
-var margin = {top: 20, right: 30, bottom: 20, left: 30};
+var margin = {top: 20, right: 30, bottom: 0, left: 30};
 var xScale = d3.scale.linear().range([0, chartDimension - margin.right - margin.left]);
 var yScale = d3.scale.linear().range([chartDimension / 2, 0]);
+var yScaleCumul = d3.scale.linear().range([(chartDimension - margin.top - margin.bottom) / 2, 0]);
 
 var area = d3.svg.area().interpolate('cardinal')
   .x(function(d){return xScale(d.originalIndex) + margin.left;})
   .y0(0 + margin.top)
   .y1(function(d){return yScale(d.count);})
+
+var areaCumul = d3.svg.area().interpolate('cardinal')
+  .x(function(d){return xScale(d.originalIndex) + margin.left;})
+  .y0(function(d){return chartDimension / 2 + yScaleCumul(totalCount - d.cumulCount);})
+  .y1(chartDimension - margin.bottom)
 
 d3.csv('data.csv', formatCSVData, processData);
 
@@ -55,6 +62,7 @@ function processData(err, irsData){
 
   xScale.domain([0, irsData.length - 1]);
   yScale.domain([0, maxCount * 1.2]);
+  yScaleCumul.domain([totalCount, 0]);
 
   initialRender()
 }
@@ -66,64 +74,36 @@ function initialRender(){
   var salaryXPos = xScale(salaryStats.index);
 
   d3.select('#chart-container')
-    .append('g')
-      .attr({
-        'class': 'outline circles',
-        'fill': 'none',
-        'stroke': 'RGBA(186, 184, 175, 1)',
-        'stroke-width': 1
-      })
-      .selectAll('.outline .circle').data(incomeThresholds).enter()
-      .append('circle')
-        .attr({
-          'class': 'outline circle',
-          'r': function(d){return xScale(d.originalIndex)/2;},
-          'cx': function(d){return xScale(d.originalIndex)/2 + margin.left;},
-          'cy': chartDimension/2,
-          'opacity': 0.20
-        })
-
-  d3.select('#chart-container')
-    .append('circle')
-      .attr({
-        'class': 'salary circle',
-        'fill': 'RGBA(0, 140, 112, ' + (0.5 + 0.5 * 0.3) + ')',
-        'r': salaryXPos/2,
-        'cx': salaryXPos/2 + margin.left,
-        'cy': chartDimension/2
-      })
-
-  d3.select('#chart-container')
-    .append('rect')
-      .attr({
-        'class': 'cover white',
-        'x': 0 + margin.left,
-        'y': 0 + margin.top,
-        'width': chartDimension - margin.left - margin.right,
-        'height': chartDimension / 2 - margin.top,
-        'fill': 'white',
-      })
-
-  d3.select('#chart-container')
     .append('rect')
       .attr({
         'class': 'cover green',
-        'x': 0 + margin.left,
-        'y': 0 + margin.top,
+        'x': margin.left,
+        'y': margin.top,
         'width': chartDimension - margin.left - margin.right,
-        'height': chartDimension / 2 - margin.top,
-        'fill': 'RGBA(0, 140, 112, 0.5)'
+        'height': chartDimension - margin.top - margin.bottom,
+        'fill': 'RGBA(0, 140, 112, 0.3)'
       })
 
   d3.select('#chart-container')
     .append('rect')
       .attr({
         'class': 'cover salary',
-        'x': 0 + margin.left,
-        'y': 0 + margin.top,
-        'width': salaryXPos,
+        'x': margin.left,
+        'y': margin.top,
+        'width':  salaryXPos,
         'height': chartDimension / 2 - margin.top,
         'fill': 'RGBA(0, 140, 112, 0.5)'
+      })
+
+  d3.select('#chart-container')
+    .append('rect')
+      .attr({
+        'class': 'crosshair salary',
+        'x': salaryXPos + margin.left,
+        'y': chartDimension / 2,
+        'width':  1,
+        'height': chartDimension / 2 - margin.bottom,
+        'fill': 'white'
       })
 
   d3.select('#chart-container')
@@ -131,6 +111,14 @@ function initialRender(){
       .attr({
         'class': 'area outline',
         'd': area,
+        'fill': 'white'
+      })
+
+  d3.select('#chart-container')
+    .append('path').datum(incomeThresholds)
+      .attr({
+        'class': 'area outline',
+        'd': areaCumul,
         'fill': 'white'
       })
 
@@ -146,7 +134,6 @@ function initialRender(){
       .text(description[2])
       .attr({
         'class': 'description percentage',
-        'text-anchor': 'end',
         'alignment-baseline': 'after-edge',
         'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
         'font-size': percentageTextSize,
@@ -160,6 +147,7 @@ function initialRender(){
       .attr({
         'class': 'description text',
         'font-size': textTextSize,
+        'text-anchor': 'end',
         'alignment-baseline': 'after-edge',
         'transform': function(d, i){
           return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
@@ -188,7 +176,7 @@ function initialRender(){
           'class': 'flag line',
           'x1': function(d){return xScale(d.originalIndex) + margin.left;},
           'x2': function(d){return xScale(d.originalIndex) + margin.left;},
-          'y1': 0 + margin.top,
+          'y1': margin.top,
           'y2': function(d){return Math.max(yScale(d.count) - 15, 0.8 * yScale(d.count));}
         })
 
@@ -230,15 +218,16 @@ function calculateSalaryStats(userSalary){
 
 function getDescription(salaryStats){
   var format = d3.format('$,');
-  var percent = Math.round(salaryStats.percentage * 10000)/100;
-  if (percent > 98){
-    percent = Math.round(salaryStats.percentage * 10000)/100;
-  } else if (percent > 95){
-    percent = Math.round(salaryStats.percentage * 1000)/10;
+  var reverseCumulPercentage = 1 - salaryStats.percentage
+  var percent = Math.round(reverseCumulPercentage * 10000)/100;
+  if (percent < 1){
+    percent = Math.round(reverseCumulPercentage * 10000)/100;
+  } else if (percent < 5){
+    percent = Math.round(reverseCumulPercentage * 1000)/10;
   } else {
-    percent = Math.round(salaryStats.percentage * 100);
+    percent = Math.round(reverseCumulPercentage * 100);
   }
-  return ['of Americans earned','less than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
+  return ['of Americans earning','more than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
 }
 
 function calculateFontSize(userSalary){
@@ -253,18 +242,19 @@ function updateSalary(){
   var description = getDescription(salaryStats);
   var salaryXPos = xScale(salaryStats.index);
 
-  d3.selectAll('.salary.circle')
-    .transition().duration(1000)
-    .attr({
-      'r': salaryXPos/2,
-      'cx': salaryXPos/2 + margin.left
-    })
-
   d3.selectAll('.cover.salary')
     .transition().duration(1000)
     .attr({
-      'width': salaryXPos
+      'width':  salaryXPos,
+      'height': chartDimension / 2 - margin.top,
     })
+
+  d3.selectAll('.crosshair.salary')
+    .transition().duration(1000)
+    .attr({
+      'x': salaryXPos + margin.left,
+    })
+
 
   var percentageTextSize = calculateFontSize(userSalary);
   d3.selectAll('.description.percentage')
@@ -292,29 +282,6 @@ function updateElements(){
   var salaryStats = calculateSalaryStats(userSalary);
   var description = getDescription(salaryStats);
   var salaryXPos = xScale(salaryStats.index);
-
-  d3.selectAll('.outline .circle').data(incomeThresholds)
-    .transition()
-    .attr({
-      'r': function(d){return xScale(d.originalIndex)/2;},
-      'cx': function(d){return xScale(d.originalIndex)/2 + margin.left;},
-      'cy': chartDimension/2,
-    })
-
-  d3.selectAll('.salary.circle')
-    .transition()
-    .attr({
-      'r': salaryXPos/2,
-      'cx': salaryXPos/2 + margin.left,
-      'cy': chartDimension/2
-    })
-
-  d3.selectAll('.cover.white')
-    .transition()
-    .attr({
-      'width': chartDimension - margin.left - margin.right,
-      'height': chartDimension / 2 - margin.top
-    })
 
   d3.selectAll('.cover.green')
     .transition()
@@ -371,7 +338,7 @@ function updateElements(){
 
 function updateWindow(){
   width = chartContainer.offsetWidth;
-  height = window.innerHeight - upperContainer.offsetHeight;
+  height = window.innerHeight - upperContainer.offsetHeight - bottomContainer.offsetHeight;
 
   chartDimension = Math.min(width, height);
   leftAdjust = Math.max(0, (width - chartDimension)/2);
