@@ -7,7 +7,7 @@ var typPadding = 2;
 var upperContainer = document.getElementById('upper-content');
 var chartContainer = document.getElementById('chart');
 var width = chartContainer.offsetWidth;
-var height = window.innerHeight - chartContainer.offsetHeight;
+var height = window.innerHeight - upperContainer.offsetHeight;
 
 var chartDimension = Math.min(width, height);
 var leftAdjust = Math.max(0, (width - chartDimension)/2);
@@ -30,6 +30,8 @@ var area = d3.svg.area().interpolate('cardinal')
   .y1(function(d){return yScale(d.count);})
 
 d3.csv('data.csv', formatCSVData, processData);
+
+window.onresize = updateWindow;
 
 function formatCSVData(irsCsv, index){
   totalCount += +irsCsv.count;
@@ -241,7 +243,8 @@ function getDescription(salaryStats){
 }
 
 function calculateFontSize(userSalary){
-  var calculatedSize = Math.max(6, userSalary/13000 * 36);
+  var chartDimensionMultiplier = chartDimension / 400;
+  var calculatedSize = Math.max(6, userSalary/13000 * 36 * chartDimensionMultiplier);
   return Math.min(calculatedSize, 36)
 }
 
@@ -283,4 +286,111 @@ function updateSalary(){
         return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
       }
     })
+}
+
+function updateElements(){
+  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim() || 100000;
+  var salaryStats = calculateSalaryStats(userSalary);
+  var description = getDescription(salaryStats);
+  var salaryXPos = xScale(salaryStats.index);
+  console.log(xScale(1))
+
+  d3.selectAll('.outline .circle').data(incomeThresholds)
+    .transition()
+    .attr({
+      'r': function(d){return xScale(d.originalIndex)/2;},
+      'cx': function(d){return xScale(d.originalIndex)/2 + margin.left;},
+      'cy': chartDimension/2,
+    })
+
+  d3.selectAll('.salary.circle')
+    .transition()
+    .attr({
+      'r': salaryXPos/2,
+      'cx': salaryXPos/2 + margin.left,
+      'cy': chartDimension/2
+    })
+
+  d3.selectAll('.cover.white')
+    .transition()
+    .attr({
+      'width': chartDimension - margin.left - margin.right,
+      'height': chartDimension / 2 - margin.top
+    })
+
+  d3.selectAll('.cover.green')
+    .transition()
+    .attr({
+      'width': chartDimension - margin.left - margin.right,
+      'height': chartDimension / 2 - margin.top
+    })
+
+  d3.selectAll('.cover.salary')
+    .attr({
+      'width': salaryXPos,
+      'height': chartDimension / 2 - margin.top
+    })
+
+  d3.selectAll('.area.outline').datum(incomeThresholds)
+    .transition()
+    .attr({
+      'd': area
+    })
+
+  var percentageTextSize = calculateFontSize(userSalary);
+  d3.selectAll('.description.percentage')
+    .transition()
+    .attr({
+      'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
+      'font-size': percentageTextSize
+    })
+
+  var textTextSize = 14;
+  d3.selectAll('.description.text').data(description.slice(0,2))
+    .transition()
+    .attr({
+      'font-size': textTextSize,
+      'transform': function(d, i){
+        return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
+      }
+    })
+
+  d3.selectAll('.flag.line').data(incomeThresholds)
+    .attr({
+      'x1': function(d){return xScale(d.originalIndex) + margin.left;},
+      'x2': function(d){return xScale(d.originalIndex) + margin.left;},
+      'y2': function(d){return Math.max(yScale(d.count) - 15, 0.8 * yScale(d.count));}
+    })
+
+  d3.selectAll('.flag.label').data(incomeThresholds)
+    .transition()
+    .attr({
+      'transform': function(d){return 'translate('+ (xScale(d.originalIndex) + margin.left) +',' + (0 + margin.top) + ')rotate(-90)';}
+    })
+
+}
+
+function updateWindow(){
+  width = chartContainer.offsetWidth;
+  height = window.innerHeight - upperContainer.offsetHeight;
+
+  chartDimension = Math.min(width, height);
+  leftAdjust = Math.max(0, (width - chartDimension)/2);
+  topAdjust = 0;
+
+  d3.select('svg')
+    .attr({
+      'width': width,
+      'height': height
+    })
+
+  d3.select('#chart-container')
+    .attr('transform', 'translate(' + leftAdjust + ',' + topAdjust + ')');
+
+  // UPDATE THE D3 EQUATIONS
+  xScale.range([0, chartDimension - margin.right - margin.left]);
+  yScale.range([chartDimension / 2, 0]);
+
+  updateElements();
+  // updateSalary();
 }
