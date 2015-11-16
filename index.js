@@ -153,18 +153,18 @@ function initialRender(){
   var percentageTextSize = calculateFontSize();
   descriptions
     .append('text')
-      .text(description[1])
+      .text(description[2])
       .attr({
         'class': 'description percentage',
         'text-anchor': 'end',
         'alignment-baseline': 'after-edge',
         'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
         'font-size': percentageTextSize,
-        'fill': '#FF2B69'
+        'fill': '#FF1744'
       })
 
-  var textTextSize = 16;
-  descriptions.selectAll('.description.text').data(description.slice(0,1)).enter()
+  var textTextSize = 14;
+  descriptions.selectAll('.description.text').data(description.slice(0,2)).enter()
     .append('text')
       .text(function(d){return d;})
       .attr({
@@ -249,11 +249,11 @@ function getDescription(salaryStats){
   } else {
     percent = Math.round(salaryStats.percentage * 100);
   }
-  return ['earned more', percent + '%'];
+  return ['earned more','than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
 }
 
 function calculateFontSize(){
-  var chartDimensionMultiplier = chartDimension / 800;
+  var chartDimensionMultiplier = chartDimension / 1000;
   var calculatedSize = 48 * chartDimensionMultiplier;
   return Math.min(calculatedSize, 48);
 }
@@ -285,14 +285,14 @@ function updateSalary(){
     })
 
   d3.selectAll('.description.percentage')
-    .text(description[1])
+    .text(description[2])
     .transition().duration(1000)
     .attr({
       'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')'
     })
 
-  var textTextSize = 16;
-  d3.selectAll('.description.text').data(description.slice(0,1))
+  var textTextSize = 14;
+  d3.selectAll('.description.text').data(description.slice(0,2))
     .text(function(d){return d;})
     .transition().duration(1000)
     .attr({
@@ -369,7 +369,7 @@ function updateElements(){
     })
 
   var textTextSize = 14;
-  d3.selectAll('.description.text').data(description.slice(0,1))
+  d3.selectAll('.description.text').data(description.slice(0,2))
     .transition()
     .attr({
       'font-size': textTextSize,
