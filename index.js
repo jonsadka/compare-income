@@ -243,11 +243,11 @@ function getDescription(salaryStats){
   var format = d3.format('$,');
   var percent = Math.round(salaryStats.percentage * 10000)/100;
   if (percent > 98){
-    percent = Math.round(salaryStats.percentage * 10000)/100;
+    percent = Math.round((1 - salaryStats.percentage) * 10000)/100;
   } else if (percent > 95){
-    percent = Math.round(salaryStats.percentage * 1000)/10;
+    percent = Math.round((1 - salaryStats.percentage) * 1000)/10;
   } else {
-    percent = Math.round(salaryStats.percentage * 100);
+    percent = Math.round((1 - salaryStats.percentage) * 100);
   }
   return ['earned more','than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
 }
