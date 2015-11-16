@@ -80,7 +80,7 @@ function initialRender(){
           'r': function(d){return xScale(d.originalIndex)/2;},
           'cx': function(d){return xScale(d.originalIndex)/2 + margin.left;},
           'cy': chartDimension/2,
-          'opacity': 0.20
+          'opacity': 0.25
         })
 
   d3.select('#chart-container')
@@ -150,31 +150,32 @@ function initialRender(){
         'class': 'descriptions',
       })
 
-  var percentageTextSize = calculateFontSize(userSalary);
+  var percentageTextSize = calculateFontSize();
   descriptions
     .append('text')
-      .text(description[2])
+      .text(description[1])
       .attr({
         'class': 'description percentage',
         'text-anchor': 'end',
         'alignment-baseline': 'after-edge',
-        'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
+        'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
         'font-size': percentageTextSize,
-        'fill': 'white'
+        'fill': '#FF2B69'
       })
 
-  var textTextSize = 14;
-  descriptions.selectAll('.description.text').data(description.slice(0,2)).enter()
+  var textTextSize = 16;
+  descriptions.selectAll('.description.text').data(description.slice(0,1)).enter()
     .append('text')
       .text(function(d){return d;})
       .attr({
         'class': 'description text',
         'font-size': textTextSize,
+        'text-anchor': 'end',
         'alignment-baseline': 'after-edge',
         'transform': function(d, i){
-          return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
+          return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
         },
-        'fill': '#868174'
+        'fill': 'RGBA(0, 140, 112, 1)'
       })
 
   var flags = d3.select('#chart-container')
@@ -207,7 +208,7 @@ function initialRender(){
       .attr({
         'class': 'flags labels',
         'stroke': 'none',
-        'font-size': 12
+        'font-size': 14
       })
       .selectAll('.flag.label').data(incomeThresholds).enter()
       .append('text')
@@ -248,13 +249,13 @@ function getDescription(salaryStats){
   } else {
     percent = Math.round(salaryStats.percentage * 100);
   }
-  return ['of Americans earned','less than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
+  return ['earned more', percent + '%'];
 }
 
-function calculateFontSize(userSalary){
-  var chartDimensionMultiplier = chartDimension / 400;
-  var calculatedSize = Math.max(6, userSalary/13000 * 36 * chartDimensionMultiplier);
-  return Math.min(calculatedSize, 36)
+function calculateFontSize(){
+  var chartDimensionMultiplier = chartDimension / 800;
+  var calculatedSize = 48 * chartDimensionMultiplier;
+  return Math.min(calculatedSize, 48);
 }
 
 function updateSalary(){
@@ -283,23 +284,21 @@ function updateSalary(){
       'width': salaryXPos
     })
 
-  var percentageTextSize = calculateFontSize(userSalary);
   d3.selectAll('.description.percentage')
-    .text(description[2])
+    .text(description[1])
     .transition().duration(1000)
     .attr({
-      'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
-      'font-size': percentageTextSize
+      'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')'
     })
 
-  var textTextSize = 14;
-  d3.selectAll('.description.text').data(description.slice(0,2))
+  var textTextSize = 16;
+  d3.selectAll('.description.text').data(description.slice(0,1))
     .text(function(d){return d;})
     .transition().duration(1000)
     .attr({
       'font-size': textTextSize,
       'transform': function(d, i){
-        return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
+        return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
       }
     })
 }
@@ -361,21 +360,21 @@ function updateElements(){
       'd': area
     })
 
-  var percentageTextSize = calculateFontSize(userSalary);
+  var percentageTextSize = calculateFontSize();
   d3.selectAll('.description.percentage')
     .transition()
     .attr({
-      'transform': 'translate(' + (salaryXPos + margin.right - typPadding) + ',' + (chartDimension / 2 + percentageTextSize + typPadding) + ')',
+      'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
       'font-size': percentageTextSize
     })
 
   var textTextSize = 14;
-  d3.selectAll('.description.text').data(description.slice(0,2))
+  d3.selectAll('.description.text').data(description.slice(0,1))
     .transition()
     .attr({
       'font-size': textTextSize,
       'transform': function(d, i){
-        return 'translate(' + (salaryXPos + margin.right + typPadding) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
+        return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
       }
     })
 
