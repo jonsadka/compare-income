@@ -94,6 +94,16 @@ function initialRender(){
       })
 
   d3.select('#chart-container')
+    .append('circle')
+      .attr({
+        'class': 'missing salary circle',
+        'fill': 'RGBA(0, 140, 112,0.25)',
+        'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
+        'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
+        'cy': chartDimension/2
+      })
+
+  d3.select('#chart-container')
     .append('rect')
       .attr({
         'class': 'cover white',
@@ -112,7 +122,7 @@ function initialRender(){
         'y': 0 + margin.top,
         'width': chartDimension - margin.left - margin.right,
         'height': chartDimension / 2 - margin.top,
-        'fill': 'RGBA(0, 140, 112, 0.5)'
+        'fill': 'RGBA(0, 140, 112, 0.25)'
       })
 
   d3.select('#chart-container')
@@ -260,6 +270,13 @@ function updateSalary(){
       'cx': salaryXPos/2 + margin.left
     })
 
+  d3.selectAll('.missing.salary.circle')
+    .transition().duration(1000)
+    .attr({
+      'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
+      'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2
+    })
+
   d3.selectAll('.cover.salary')
     .transition().duration(1000)
     .attr({
@@ -306,6 +323,14 @@ function updateElements(){
     .attr({
       'r': salaryXPos/2,
       'cx': salaryXPos/2 + margin.left,
+      'cy': chartDimension/2
+    })
+
+  d3.selectAll('.missing.salary.circle')
+    .transition()
+    .attr({
+      'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
+      'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
       'cy': chartDimension/2
     })
 
