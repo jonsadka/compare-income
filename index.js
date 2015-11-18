@@ -160,7 +160,7 @@ function initialRender(){
         'alignment-baseline': 'after-edge',
         'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
         'font-size': percentageTextSize,
-        'fill': '#FF1744'
+        'fill': 'RGBA(255, 109, 24, 1)'
       })
 
   var textTextSize = 14;
@@ -227,7 +227,7 @@ function calculateSalaryStats(userSalary){
     if (userSalary < threshold.upperThreshold) {
       var factor = (userSalary - threshold.lowerThreshold)/(threshold.upperThreshold - threshold.lowerThreshold);
       var calculatedIndex = i + factor;
-      var calculatedCumulCount = threshold.cumulCount - factor * threshold.count
+      var calculatedCumulCount = threshold.cumulCount - (1 - factor) * threshold.count
 
       return {
           userSalary: userSalary,
