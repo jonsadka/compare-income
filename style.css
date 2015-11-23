@@ -11,10 +11,72 @@ body {
   color: #868174;
 }
 
+#upper-content {
+  height: 65px;
+  position: relative;
+}
+
+.nav-bar {
+  background: RGBA(186, 184, 175, 1);
+  color: white;
+  height: 54px;
+}
+
+.title {
+  position: absolute;
+  font-size: 18px;
+  top: 2px;
+  left: 2px;
+}
+
+.name {
+  float: right;
+}
+
+/*Income distribution*/
+
+.user-salary {
+  position: absolute;
+  right: calc(50% - 150px / 2);
+  top: 25px;
+  color: #868174;
+}
+
+.user-salary .currency {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  font-size: 14px;
+  color: RGBA(186, 184, 175, 1)
+}
+
+.user-salary .prompt {
+  position: absolute;
+  left: -10px;
+  top: 12px;
+  font-size: 14px;
+  color: pink;
+}
+
 #chart {
   width: 100%;
 }
 
+input {
+  font: 18px Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  display: block;
+  border: none;
+  padding: 10px;
+  width: 150px;
+  font-size: 18px;
+  outline: none;
+  background-color: white;
+  color: RGBA(186, 184, 175, 1);
+  border-bottom: 1px solid white;
+  text-align: center;
+  border-radius: 8px;
+}
 
 /*FOR TESTING*/
 svg {
