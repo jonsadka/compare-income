@@ -1,7 +1,3 @@
-/*BROWN = RGBA(186, 184, 175, 1)*/
-/*DARK_BROWN = #868174*/
-
-
 * {
   overflow: hidden;
   box-sizing: border-box;
@@ -10,36 +6,47 @@
 }
 
 body {
-  font: 10px Helvetica;
-  font-family: Helvetica, sans-serif;
+  font: 10px Verdana;
+  font-family: Verdana, Geneva, sans-serif;
   color: #868174;
 }
 
 #upper-content {
-  height: 65px;
-  position: relative;
-}
-
-.nav-bar {
-  background: RGBA(186, 184, 175, 1);
-  color: white;
-  height: 54px;
-}
-
-.title {
+  /*position: relative;*/
   position: absolute;
-  font-size: 18px;
-  top: 2px;
-  left: 2px;
+  width: 100%;
+  left: 40px;
+  top: 40px;
 }
+
+#upper-content p {
+  width: 360px;
+  padding-top: 10px;
+  font-size: 14px;
+}
+
+#upper-content p.label {
+  padding-top: 4px;
+  font-size: 10px;
+  width: 800px;
+}
+
+/*.title {
+  position: relative;
+  font-size: 24px;
+}*/
 
 .name {
-  float: right;
+  /*float: right;*/
+}
+
+svg {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 /*Income distribution*/
 
-.user-salary {
+/*.user-salary {
   position: absolute;
   right: calc(50% - 150px / 2);
   top: 25px;
@@ -52,17 +59,18 @@ body {
   top: 12px;
   font-size: 14px;
   color: RGBA(186, 184, 175, 1)
-}
+}*/
 
-.user-salary .prompt {
+/*.user-salary .prompt {
   position: absolute;
   left: -10px;
   top: 12px;
   font-size: 14px;
   color: pink;
-}
+}*/
 
 #chart {
+  /*padding-top: 50px;*/
   width: 100%;
 }
 

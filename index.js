@@ -1,7 +1,10 @@
 var BROWN = 'RGBA(186, 184, 175,';
+var DARK_BROWN = 'RGBA(134, 129, 116,'
 var GREEN = 'RGBA(0, 140, 112,';
-var ORANGE = 'RGBA(255, 109, 24, 1)';
-var WHITE = 'white'
+var ORANGE = 'RGBA(255, 109, 24,';
+var VOLT = 'RGBA(214, 250, 0,';
+var WHITE = 'RGBA(255, 255, 255,';
+var GRAY = 'RGBA(54, 54, 54,';
 
 var maxCount = 0;
 var totalCount = 0;
@@ -9,10 +12,9 @@ var incomeThresholds = [];
 var typPadding = 2;
 
 // ADD PAGE ELEMENTS
-var upperContainer = document.getElementById('upper-content');
 var chartContainer = document.getElementById('chart');
 var width = chartContainer.offsetWidth;
-var height = window.innerHeight - upperContainer.offsetHeight;
+var height = window.innerHeight;
 
 var chartDimension = Math.min(width, height);
 var leftAdjust = Math.max(0, (width - chartDimension)/2);
@@ -20,12 +22,13 @@ var topAdjust = 0;
 
 var svg = d3.select('#chart').append('svg')
   .attr('width', width).attr('height', height)
+  .style('background-color', WHITE + '1)')
   .append('g')
     .attr('id','chart-container')
     .attr('transform', 'translate(' + leftAdjust + ',' + topAdjust + ')');
 
 // SETUP THE D3 EQUATIONS
-var margin = {top: 20, right: 30, bottom: 20, left: 30};
+var margin = {top: 30, right: 30, bottom: 30, left: 30};
 var xScale = d3.scale.linear().range([0, chartDimension - margin.right - margin.left]);
 var yScale = d3.scale.linear().range([chartDimension / 2, 0]);
 
@@ -102,7 +105,9 @@ function initialRender(){
     .append('circle')
       .attr({
         'class': 'missing salary circle',
-        'fill': GREEN + '0.25)',
+        'fill': GREEN + '0.2)',
+        // 'stroke': VOLT + '1)',
+        // 'stroke-width': 1,
         'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
         'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
         'cy': chartDimension/2
@@ -116,7 +121,7 @@ function initialRender(){
         'y': 0 + margin.top,
         'width': chartDimension - margin.left - margin.right,
         'height': chartDimension / 2 - margin.top,
-        'fill': WHITE,
+        'fill': WHITE + '1)',
       })
 
   d3.select('#chart-container')
@@ -146,7 +151,7 @@ function initialRender(){
       .attr({
         'class': 'area outline',
         'd': area,
-        'fill': WHITE
+        'fill': WHITE + '1)'
       })
 
   var descriptions = d3.select('#chart-container')
@@ -165,7 +170,7 @@ function initialRender(){
         'alignment-baseline': 'after-edge',
         'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
         'font-size': percentageTextSize,
-        'fill': ORANGE
+        'fill': ORANGE + '1)'
       })
 
   var textTextSize = 14;
@@ -180,7 +185,7 @@ function initialRender(){
         'transform': function(d, i){
           return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
         },
-        'fill': GREEN + '1)'
+        'fill': WHITE + '1)'
       })
 
   var flags = d3.select('#chart-container')
@@ -400,7 +405,7 @@ function updateElements(){
 
 function updateWindow(){
   width = chartContainer.offsetWidth;
-  height = window.innerHeight - upperContainer.offsetHeight;
+  height = window.innerHeight;
 
   chartDimension = Math.min(width, height);
   leftAdjust = Math.max(0, (width - chartDimension)/2);
