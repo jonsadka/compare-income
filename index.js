@@ -1,3 +1,8 @@
+var BROWN = 'RGBA(186, 184, 175,';
+var GREEN = 'RGBA(0, 140, 112,';
+var ORANGE = 'RGBA(255, 109, 24, 1)';
+var WHITE = 'white'
+
 var maxCount = 0;
 var totalCount = 0;
 var incomeThresholds = [];
@@ -70,7 +75,7 @@ function initialRender(){
       .attr({
         'class': 'outline circles',
         'fill': 'none',
-        'stroke': 'RGBA(186, 184, 175, 1)',
+        'stroke': BROWN + '1)',
         'stroke-width': 1
       })
       .selectAll('.outline .circle').data(incomeThresholds).enter()
@@ -87,7 +92,7 @@ function initialRender(){
     .append('circle')
       .attr({
         'class': 'salary circle',
-        'fill': 'RGBA(0, 140, 112, ' + (0.5 + 0.5 * 0.3) + ')',
+        'fill': GREEN + (0.5 + 0.5 * 0.3) + ')',
         'r': salaryXPos/2,
         'cx': salaryXPos/2 + margin.left,
         'cy': chartDimension/2
@@ -97,7 +102,7 @@ function initialRender(){
     .append('circle')
       .attr({
         'class': 'missing salary circle',
-        'fill': 'RGBA(0, 140, 112,0.25)',
+        'fill': GREEN + '0.25)',
         'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
         'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
         'cy': chartDimension/2
@@ -111,7 +116,7 @@ function initialRender(){
         'y': 0 + margin.top,
         'width': chartDimension - margin.left - margin.right,
         'height': chartDimension / 2 - margin.top,
-        'fill': 'white',
+        'fill': WHITE,
       })
 
   d3.select('#chart-container')
@@ -122,7 +127,7 @@ function initialRender(){
         'y': 0 + margin.top,
         'width': chartDimension - margin.left - margin.right,
         'height': chartDimension / 2 - margin.top,
-        'fill': 'RGBA(0, 140, 112, 0.25)'
+        'fill': GREEN + '0.25)'
       })
 
   d3.select('#chart-container')
@@ -133,7 +138,7 @@ function initialRender(){
         'y': 0 + margin.top,
         'width': salaryXPos,
         'height': chartDimension / 2 - margin.top,
-        'fill': 'RGBA(0, 140, 112, 0.5)'
+        'fill': GREEN + '0.5)'
       })
 
   d3.select('#chart-container')
@@ -141,7 +146,7 @@ function initialRender(){
       .attr({
         'class': 'area outline',
         'd': area,
-        'fill': 'white'
+        'fill': WHITE
       })
 
   var descriptions = d3.select('#chart-container')
@@ -160,7 +165,7 @@ function initialRender(){
         'alignment-baseline': 'after-edge',
         'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
         'font-size': percentageTextSize,
-        'fill': 'RGBA(255, 109, 24, 1)'
+        'fill': ORANGE
       })
 
   var textTextSize = 14;
@@ -175,15 +180,15 @@ function initialRender(){
         'transform': function(d, i){
           return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
         },
-        'fill': 'RGBA(0, 140, 112, 1)'
+        'fill': GREEN + '1)'
       })
 
   var flags = d3.select('#chart-container')
     .append('g')
       .attr({
         'class': 'flags',
-        'stroke': 'RGBA(186, 184, 175, 0.25)',
-        'fill': 'RGBA(186, 184, 175, 0.75)',
+        'stroke': BROWN + '0.25)',
+        'fill': BROWN + '0.75)',
         'stroke-width': 1
       })
 
