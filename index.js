@@ -10,7 +10,7 @@ var maxCount = 0;
 var totalCount = 0;
 var incomeThresholds = [];
 var typPadding = 2;
-var topMargin = 50;
+var topMargin = 70;
 
 // ADD PAGE ELEMENTS
 var chartContainer = document.getElementById('chart');
