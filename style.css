@@ -6,29 +6,41 @@
 }
 
 body {
-  font: 10px Verdana;
-  font-family: Verdana, Geneva, sans-serif;
+  font: 10px "Helvetica Neue";
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #868174;
 }
 
 #upper-content {
-  /*position: relative;*/
   position: absolute;
   width: 100%;
-  left: 40px;
-  top: 40px;
+  left: 30px;
+  top: 30px;
 }
 
 #upper-content p {
-  width: 360px;
+  width: 300px;
   padding-top: 10px;
   font-size: 14px;
 }
 
-#upper-content p.label {
-  padding-top: 4px;
+#lower-content {
+  position: absolute;
+  width: 100%;
+  left: 30px;
+  bottom: 20px;
+}
+
+#lower-content p {
+  padding-top: 2px;
   font-size: 10px;
-  width: 800px;
+  width: 100%;
+}
+
+#chart {
+  margin-top: 50px;
+  /*margin-left: 25%;*/
+  /*width: 70%;*/
 }
 
 /*.title {
@@ -37,56 +49,48 @@ body {
 }*/
 
 .name {
-  /*float: right;*/
-}
-
-svg {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-/*Income distribution*/
-
-/*.user-salary {
   position: absolute;
-  right: calc(50% - 150px / 2);
-  top: 25px;
-  color: #868174;
+  bottom: 0;
+  right: 50px;
+}
+
+.user-salary {
+  padding-top: 40px;
+  /*position: absolute;*/
+  /*right: calc(50% - 150px / 2);*/
+  /*top: 25px;*/
+  /*color: #868174;*/
 }
 
 .user-salary .currency {
-  position: absolute;
-  left: 10px;
-  top: 12px;
-  font-size: 14px;
-  color: RGBA(186, 184, 175, 1)
-}*/
+  position: relative;
+  left: -64px;
+  top: 20px;
+  /*font-size: 14px;*/
+  /*color: RGBA(186, 184, 175, 1)*/
+}
 
 /*.user-salary .prompt {
   position: absolute;
   left: -10px;
   top: 12px;
   font-size: 14px;
-  color: pink;
 }*/
 
-#chart {
-  /*padding-top: 50px;*/
-  width: 100%;
-}
 
 input {
   font: 18px Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   display: block;
   border: none;
-  padding: 10px;
+  padding: 6px;
   width: 150px;
   font-size: 18px;
   outline: none;
-  background-color: white;
-  color: RGBA(186, 184, 175, 1);
+  background-color: RGBA(0, 140, 112, 0);
+  color: RGBA(0, 140, 112, 1);
   border-bottom: 1px solid white;
-  text-align: center;
+  /*text-align: center;*/
   border-radius: 8px;
 }
 

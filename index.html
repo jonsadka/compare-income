@@ -7,15 +7,8 @@
   </head>
   <body>
     <div id="upper-content">
-      <h1 class="title">U.S wage comparison</h1>
-      <div>
-        <p>The visualization shows the distribution of individual tax returns filed in 2013 in the United States. Input your salary to see how your salary compares to the rest of tax filers in America. Calcuation assumes straight line interpolation between income ranges.</p>
-        <p class="label">Data source: IRS, Statistics of Income—Individual Income Tax Returns, 2013.</p>
-        <p class="label">Total: 147,351,299 individual income tax returns in 2013.</p>
-      </div>
-      <div class="nav-bar">
-        <span class="name">Jon Sadka</span>
-      </div>
+      <h1 class="title">United States income comparison</h1>
+      <p>The visualization shows the distribution of individual tax returns filed in 2013 in the United States. Input your salary to see how your salary compares to the rest of tax filers in America.</p>
       <div class="user-salary">
         <span class="prompt">Enter income:</span>
         <span class="currency">$</span>
@@ -23,6 +16,12 @@
       </div>
     </div>
     <div id="chart"></div>
+    <div id="lower-content">
+      <span class="name"><a href="http://jonsadka.com">Jon Sadka</a></span>
+      <p class="label">Complied from 147,351,299 individual income tax returns in 2013.</p>
+      <p class="label">Calcuation assumes straight line interpolation between income ranges.</p>
+      <p class="label">Source: IRS, Statistics of Income—Individual Income Tax Returns, 2013.</p>
+    </div>
     <!-- SCRIPTS -->
     <script type="text/javascript" src="node_modules/d3/d3.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="index.js" charset="utf-8"></script>

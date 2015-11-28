@@ -10,11 +10,12 @@ var maxCount = 0;
 var totalCount = 0;
 var incomeThresholds = [];
 var typPadding = 2;
+var topMargin = 50;
 
 // ADD PAGE ELEMENTS
 var chartContainer = document.getElementById('chart');
 var width = chartContainer.offsetWidth;
-var height = window.innerHeight;
+var height = window.innerHeight - topMargin;
 
 var chartDimension = Math.min(width, height);
 var leftAdjust = Math.max(0, (width - chartDimension)/2);
@@ -28,7 +29,7 @@ var svg = d3.select('#chart').append('svg')
     .attr('transform', 'translate(' + leftAdjust + ',' + topAdjust + ')');
 
 // SETUP THE D3 EQUATIONS
-var margin = {top: 30, right: 30, bottom: 30, left: 30};
+var margin = {top: 50, right: 50, bottom: 50, left: 50};
 var xScale = d3.scale.linear().range([0, chartDimension - margin.right - margin.left]);
 var yScale = d3.scale.linear().range([chartDimension / 2, 0]);
 
@@ -106,8 +107,6 @@ function initialRender(){
       .attr({
         'class': 'missing salary circle',
         'fill': GREEN + '0.2)',
-        // 'stroke': VOLT + '1)',
-        // 'stroke-width': 1,
         'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
         'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
         'cy': chartDimension/2
@@ -405,7 +404,7 @@ function updateElements(){
 
 function updateWindow(){
   width = chartContainer.offsetWidth;
-  height = window.innerHeight;
+  height = window.innerHeight - topMargin;
 
   chartDimension = Math.min(width, height);
   leftAdjust = Math.max(0, (width - chartDimension)/2);
