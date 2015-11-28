@@ -8,12 +8,14 @@
   <body>
     <div id="upper-content">
       <input type="text" name="name" class="question" id="usersalary" onkeyup="updateSalary()" onmousedown="updateSalary()" value="476,000" onmouseup="updateSalary()" required/>
-      <label for="usersalary"><span>What's your income?</span></label>
-      <span class="currency">$</span>
+      <label for="usersalary">
+        <span>What's your income?</span>
+        <span for="usersalary" class="currency">$</span>
+      </label>
     </div>
     <div id="chart"></div>
     <div id="lower-content">
-      <h1 class="title">United States income comparison</h1>
+      <div class="title">United States income comparison</div>
       <p>The visualization shows the distribution of individual tax returns filed in 2013 in the United States. Input your salary to see how your salary compares to the rest of tax filers in America.</p>
       <span class="name"><a href="http://jonsadka.com">Jon Sadka</a></span>
       <p class="label">Complied from 147,351,299 individual income tax returns in 2013.</p>
