@@ -54,6 +54,23 @@ body {
   right: 50px;
 }
 
+.axis path,
+.axis line {
+  fill: none;
+  stroke: RGBA(186, 184, 175, 0);
+  shape-rendering: crispEdges;
+}
+
+.axis .tick text {
+  fill: RGBA(186, 184, 175, 0.75);
+}
+
+.axis .tick line {
+  fill: none;
+  stroke: RGBA(186, 184, 175, 0.75);
+  shape-rendering: crispEdges;
+}
+
 /*
 Basic input element using psuedo classes
 */

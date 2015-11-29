@@ -226,6 +226,16 @@ function initialRender(){
           'text-anchor': 'end',
           'transform': function(d){return 'translate('+ (xScale(d.originalIndex) + margin.left) +',' + (0 + margin.top) + ')rotate(-90)';}
         })
+
+  var yAxis = d3.svg.axis()
+    .scale(yScale).orient('left')
+    .ticks(4).tickFormat(d3.format('s'))
+
+  d3.select('#chart-container')
+    .append('g')
+      .attr('transform', 'translate(' + margin.left + ',' + 0 + ')')
+      .attr('class', 'y axis')
+      .call(yAxis)
 }
 
 function calculateSalaryStats(userSalary){
@@ -398,6 +408,11 @@ function updateElements(){
     .attr({
       'transform': function(d){return 'translate('+ (xScale(d.originalIndex) + margin.left) +',' + (0 + margin.top) + ')rotate(-90)';}
     })
+
+  yAxis = d3.svg.axis()
+    .scale(yScale).orient('left')
+    .ticks(4).tickFormat(d3.format('s'))
+  d3.selectAll('.y.axis').transition().call(yAxis)
 }
 
 function updateWindow(){
