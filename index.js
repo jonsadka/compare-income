@@ -2,7 +2,6 @@ var BROWN = 'RGBA(186, 184, 175,';
 var DARK_BROWN = 'RGBA(134, 129, 116,'
 var GREEN = 'RGBA(0, 140, 112,';
 var ORANGE = 'RGBA(255, 109, 24,';
-var VOLT = 'RGBA(214, 250, 0,';
 var WHITE = 'RGBA(255, 255, 255,';
 
 var maxCount = 0;
