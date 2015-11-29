@@ -27,7 +27,7 @@ body {
 }
 
 #lower-content p {
-  width: 500px;
+  width: 450px;
   padding-bottom: 20px;
   font-size: 14px;
 }
@@ -112,11 +112,11 @@ input.question:valid + label > span {
 }
 
 input.question:invalid + label > span {
-  -webkit-animation: color_change 3s infinite alternate;
-  -moz-animation: color_change 3s infinite alternate;
-  -ms-animation: color_change 3s infinite alternate;
-  -o-animation: color_change 3s infinite alternate;
-  animation: color_change 3s infinite alternate;
+  -webkit-animation: color_change 1s infinite alternate;
+  -moz-animation: color_change 1s infinite alternate;
+  -ms-animation: color_change 1s infinite alternate;
+  -o-animation: color_change 1s infinite alternate;
+  animation: color_change 1s infinite alternate;
 }
 
 input.question:invalid + label > .currency {
@@ -153,22 +153,22 @@ input.question + label > span {
 
 /*PULSATING TEXT*/
 @-webkit-keyframes color_change {
- from { color: RGBA(186, 184, 175, 1); }
+ from { color: RGBA(186, 184, 175, 0.65); }
  to { color: RGBA(255, 109, 24, 0.3); }
 }
 @-moz-keyframes color_change {
- from { color: RGBA(186, 184, 175, 1); }
+ from { color: RGBA(186, 184, 175, 0.65); }
  to { color: RGBA(255, 109, 24, 0.3); }
 }
 @-ms-keyframes color_change {
- from { color: RGBA(186, 184, 175, 1); }
+ from { color: RGBA(186, 184, 175, 0.65); }
  to { color: RGBA(255, 109, 24, 0.3); }
 }
 @-o-keyframes color_change {
- from { color: RGBA(186, 184, 175, 1); }
+ from { color: RGBA(186, 184, 175, 0.65); }
  to { color: RGBA(255, 109, 24, 0.3); }
 }
 @keyframes color_change {
- from { color: RGBA(186, 184, 175, 1); }
+ from { color: RGBA(186, 184, 175, 0.65); }
  to { color: RGBA(255, 109, 24, 0.3); }
 }
