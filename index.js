@@ -4,7 +4,6 @@ var GREEN = 'RGBA(0, 140, 112,';
 var ORANGE = 'RGBA(255, 109, 24,';
 var VOLT = 'RGBA(214, 250, 0,';
 var WHITE = 'RGBA(255, 255, 255,';
-var GRAY = 'RGBA(54, 54, 54,';
 
 var maxCount = 0;
 var totalCount = 0;
@@ -31,7 +30,7 @@ var svg = d3.select('#chart').append('svg')
 // SETUP THE D3 EQUATIONS
 var margin = {top: 50, right: 50, bottom: 50, left: 50};
 var xScale = d3.scale.linear().range([0, chartDimension - margin.right - margin.left]);
-var yScale = d3.scale.linear().range([chartDimension / 2, 0]);
+var yScale = d3.scale.linear().range([chartDimension / 2, margin.top]);
 
 var area = d3.svg.area().interpolate('cardinal')
   .x(function(d){return xScale(d.originalIndex) + margin.left;})
@@ -69,7 +68,7 @@ function processData(err, irsData){
 }
 
 function initialRender(){
-  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim() || 100000;
+  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
   var salaryStats = calculateSalaryStats(userSalary);
   var description = getDescription(salaryStats);
   var salaryXPos = xScale(salaryStats.index);
@@ -131,7 +130,7 @@ function initialRender(){
         'y': 0 + margin.top,
         'width': chartDimension - margin.left - margin.right,
         'height': chartDimension / 2 - margin.top,
-        'fill': GREEN + '0.25)'
+        'fill': GREEN + '0.2)'
       })
 
   d3.select('#chart-container')
@@ -184,7 +183,7 @@ function initialRender(){
         'transform': function(d, i){
           return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
         },
-        'fill': WHITE + '1)'
+        'fill': ORANGE + '1)'
       })
 
   var flags = d3.select('#chart-container')
@@ -313,7 +312,7 @@ function updateSalary(){
 }
 
 function updateElements(){
-  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim() || 100000;
+  var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
   var salaryStats = calculateSalaryStats(userSalary);
   var description = getDescription(salaryStats);
   var salaryXPos = xScale(salaryStats.index);
@@ -421,7 +420,7 @@ function updateWindow(){
 
   // UPDATE THE D3 EQUATIONS
   xScale.range([0, chartDimension - margin.right - margin.left]);
-  yScale.range([chartDimension / 2, 0]);
+  yScale.range([chartDimension / 2, margin.top]);
 
   updateElements();
 }
