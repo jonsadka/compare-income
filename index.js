@@ -167,7 +167,7 @@ function initialRender(){
         'alignment-baseline': 'after-edge',
         'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
         'font-size': percentageTextSize,
-        'fill': ORANGE + '1)'
+        'fill': ORANGE + '0.8)'
       })
 
   var textTextSize = 14;
@@ -282,28 +282,28 @@ function updateSalary(){
   var salaryXPos = xScale(salaryStats.index);
 
   d3.selectAll('.salary.circle')
-    .transition().duration(1000)
+    .transition().duration(700)
     .attr({
       'r': salaryXPos/2,
       'cx': salaryXPos/2 + margin.left
     })
 
   d3.selectAll('.missing.salary.circle')
-    .transition().duration(1000)
+    .transition().duration(700)
     .attr({
       'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
       'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2
     })
 
   d3.selectAll('.cover.salary')
-    .transition().duration(1000)
+    .transition().duration(700)
     .attr({
       'width': salaryXPos
     })
 
   d3.selectAll('.description.percentage')
     .text(description[2])
-    .transition().duration(1000)
+    .transition().duration(700)
     .attr({
       'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')'
     })
@@ -311,7 +311,7 @@ function updateSalary(){
   var textTextSize = 14;
   d3.selectAll('.description.text').data(description.slice(0,2))
     .text(function(d){return d;})
-    .transition().duration(1000)
+    .transition().duration(700)
     .attr({
       'font-size': textTextSize,
       'transform': function(d, i){
