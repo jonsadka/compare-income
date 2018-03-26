@@ -36,7 +36,7 @@ var area = d3.svg.area().interpolate('cardinal')
   .y0(0 + margin.top)
   .y1(function(d){return yScale(d.count);})
 
-d3.csv('data.csv', formatCSVData, processData);
+d3.csv('data2013.csv', formatCSVData, processData);
 
 window.onresize = updateWindow;
 
