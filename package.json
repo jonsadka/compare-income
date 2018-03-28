@@ -1,22 +1,17 @@
 {
   "name": "income-distribution",
   "version": "1.0.0",
-  "description": "Compare your income against the rest of Americans (currently from 2013 IRS statistics) ",
+  "description": "Compare your income against the rest of Americans (from IRS statistics) ",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jonsadka/income-distribution.git"
-  },
+  "repository": "git+https://github.com/jonsadka/income-distribution.git",
   "author": "Jon Sadka",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jonsadka/income-distribution/issues"
   },
   "homepage": "https://github.com/jonsadka/income-distribution#readme",
-  "dependencies": {
-    "d3": "^3.5.6"
-  }
+  "dependencies": {}
 }
