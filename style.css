@@ -78,6 +78,10 @@ body {
   shape-rendering: crispEdges;
 }
 
+.x.axis .tick line {
+  stroke: none;
+}
+
 /*
 Basic input element using psuedo classes
 */
