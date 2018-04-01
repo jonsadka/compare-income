@@ -1,64 +1,60 @@
-// const BROWN = 'RGBA(186, 184, 175,';
-// const DARK_BROWN = 'RGBA(134, 129, 116,'
-// const GREEN = 'RGBA(0, 140, 112,';
+const BROWN = 'RGBA(186, 184, 175, 1)';
+const DARK_BROWN = 'RGBA(134, 129, 116, 1)'
+const GREEN = 'RGBA(0, 140, 112, 1)';
 // const ORANGE = 'RGBA(255, 109, 24,';
 // const WHITE = 'RGBA(255, 255, 255,';
 
-const YEARS_WHITELIST = d3.range(2001, 2014);
-const formattedData = YEARS_WHITELIST.reduce((formattedData, year) => ({
-    ...formattedData,
+const YEARS_WHITELIST = d3.range(2001, 2015);
+const dataByYear = YEARS_WHITELIST.reduce((dataByYear, year) => ({
+    ...dataByYear,
   [year]: {
     incomeThresholds: [],
     maxCount: 0,
-    totalCount: 0
+    totalCount: 0,
+    year
   }
 }), {});
 
 const DISPLAY_YEAR = 2013;
 
-// var incomeThresholds = [];
-// var typPadding = 2;
-// var topMargin = 70;
+const chartContainer = document.getElementById('chart');
+const topOffset = 70;
+const margin = {top: 20 + 3, right: 70, bottom: 50 + 20 + 108, left: 70};
+let width = chartContainer.offsetWidth;
+let height = window.innerHeight - topOffset;
 
-// var chartContainer = document.getElementById('chart');
-// var width = chartContainer.offsetWidth;
-// var height = window.innerHeight - topMargin;
+const svg = d3.select('#chart').append('svg')
+  .attr('width', width).attr('height', height)
+  .append('g')
+    .attr('id','chart-container')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-// var chartDimension = Math.min(width, height);
-// var leftAdjust = Math.max(0, (width - chartDimension)/2);
-// var topAdjust = 0;
-
-// var svg = d3.select('#chart').append('svg')
-//   .attr('width', width).attr('height', height)
-//   .style('background-color', WHITE + '1)')
-//   .append('g')
-//     .attr('id','chart-container')
-//     .attr('transform', 'translate(' + leftAdjust + ',' + topAdjust + ')');
-
-// var margin = {top: 50, right: 50, bottom: 50, left: 50};
-// var xScale = d3.scaleLinear().range([0, chartDimension - margin.right - margin.left]);
-// var yScale = d3.scaleLinear().range([chartDimension / 2, margin.top]);
-
-// var area = d3.svg.area().interpolate('cardinal')
-//   .x(function(d){return xScale(d.originalIndex) + margin.left;})
-//   .y0(0 + margin.top)
-//   .y1(function(d){return yScale(d.count);})
-
+const xScale = d3.scaleBand()
+  .range([0, width - margin.right - margin.left])
+  .paddingInner(0.1)
+  .paddingOuter(0.1);
+const yScale = d3.scaleLinear()
+  .range([height - margin.bottom, margin.top]);
+const voronoi = d3.voronoi()
+  .x(d => xScale(d.year))
+  .y(d => yScale(d.cumulCount / dataByYear[d.year].totalCount))
+  .extent([[0, 0], [width - margin.left, height - margin.bottom]]);
+let voronoiDiagram = null;
 
 d3.dsv(',', 'data.csv', formatCSVData).then((data) => {
-  console.log('~~formattedData', formattedData)
+  const years = Object.keys(dataByYear)
+  xScale.domain(years);
+  yScale.domain([0, 1]);
 
-  // xScale.domain([0, formattedData[DISPLAY_YEAR].threshold.length - 1]);
-  // yScale.domain([0, formattedData[DISPLAY_YEAR].maxCount * 1.2]);
-
-  // initialRender();
+  initialRender();
 });
 
-// window.onresize = updateWindow;
+window.onresize = updateWindow;
 
 function formatCSVData(irsCsv, index){
   YEARS_WHITELIST.forEach(year => {
-    const yearProgress = formattedData[year];
+    const yearProgress = dataByYear[year];
+    const prevCumulCount = yearProgress.totalCount;
     yearProgress.totalCount += Number(irsCsv[year]);
     yearProgress.maxCount = Math.max(yearProgress.maxCount, irsCsv[year]);
 
@@ -74,185 +70,134 @@ function formatCSVData(irsCsv, index){
       cumulCount: yearProgress.totalCount,
       lowerThreshold: lowerThreshold,
       originalIndex: index,
+      prevCumulCount,
       text: threshold[0].trim(),
-      upperThreshold: Number.isNaN(upperThreshold) ? Infinity : upperThreshold
+      upperThreshold: Number.isNaN(upperThreshold) ? Infinity : upperThreshold,
+      year
     });
   });
 }
 
-// function initialRender(){
+function initialRender(){
+  const data = d3.nest()
+    .key(d => d.year)
+    .rollup(d => d[0].incomeThresholds)
+    .entries(Object.values(dataByYear));
+
+  const vData = data.reduce((vData, d) => vData.concat(d.value), []);
+  const voronoiDiagram = voronoi(vData);
+  console.log('~~dataByYear', dataByYear)
+
+  const xAxis = d3.axisBottom(xScale);
+  const yAxis = d3.axisLeft(yScale)
+    .tickValues([0, 1])
+    .tickFormat(d3.format(".0%"));
+
+  svg.append('g')
+    .call(xAxis)
+    .attr('class','x axis')
+    .attr('transform', `translate(0,${yScale(0)})`)
+    .attr('font-size','14px');
+
+
+  svg.append('g')
+    .call(yAxis)
+    .attr('class','y axis')
+
+  const years = svg.selectAll('.year')
+      .data(data)
+    .enter().append('g')
+      .attr('class', d => `year year-${d.key}`)
+      .attr('transform', d => 'translate(' + xScale(d.key) + ',0)');
+
+  const thresholds = years.selectAll('.threshold')
+      .data(d => d.value)
+    .enter().append('rect')
+      .attr('class', d => `threshold threshold-${d.originalIndex}`)
+      .attr('fill', 'none')
+      .attr('stroke', DARK_BROWN)
+      .attr('width', xScale.bandwidth())
+      .attr('height', d =>
+        yScale(d.prevCumulCount / dataByYear[d.year].totalCount) -
+        yScale(d.cumulCount / dataByYear[d.year].totalCount))
+      .attr('x', 0)
+      .attr('y', d => yScale(d.cumulCount / dataByYear[d.year].totalCount))
+
+  const textThresholdsRight = d3.selectAll(`.year.year-2014`)
+    .selectAll('.threshold-text')
+        .data(d => d.value)
+      .enter().append('text')
+        .text(d => d.text)
+        .attr('class', d => `threshold-text threshold-text-${d.originalIndex}`)
+        .attr('x', xScale.bandwidth() + 4)
+        .attr('y', d => yScale(d.prevCumulCount / dataByYear[d.year].totalCount) + 4)
+        .attr('fill', BROWN)
+
+  const textThresholdPercentages = d3.selectAll(`.year`)
+    .selectAll('.threshold-percentages')
+        .data(d => d.value)
+      .enter().append('text')
+        .text(d => d3.format(".2%")(d.count / dataByYear[d.year].totalCount))
+        .attr('class', d => `threshold-percentages threshold-percentages-${d.originalIndex}`)
+        .attr('text-anchor', 'middle')
+        .attr('opacity', 0)
+        .attr('x', xScale.bandwidth() / 2)
+        .attr('fill', DARK_BROWN)
+        .attr('y', d =>
+          yScale(d.prevCumulCount / dataByYear[d.year].totalCount) -
+          (yScale(d.prevCumulCount / dataByYear[d.year].totalCount) -
+          yScale(d.cumulCount / dataByYear[d.year].totalCount)) / 2 + 4)
+
+  const voronoiChart = svg.append('g').selectAll('.voronoi')
+    .data(voronoiDiagram.polygons())
+    .enter().append('path')
+    .attr('d', d => d ? 'M' + d.join('L') + 'Z' : null)
+    .datum(d => d.point)
+    .attr('class', 'voronoi')
+    .style('fill', 'none')
+    .style('pointer-events', 'all')
+    .on('mouseover', mouseMoveHandler)
+    .on('mouseout',  mouseOutHandler);
+
+  // callback for when the mouse moves across the overlay
+  function mouseMoveHandler() {
+    // get the current mouse position
+    const [mx, my] = d3.mouse(this);
+
+    // use the new diagram.find() function to find the Voronoi site
+    // closest to the mouse, limited by max distance voronoiRadius
+    const site = voronoiDiagram.find(mx, my);
+
+    // highlight the point if we found one
+    highlightThreshold(site && site.data);
+  }
+
+  function mouseOutHandler() {
+    highlightThreshold(null);
+  }
+
 //   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
 //   var salaryStats = calculateSalaryStats(userSalary);
 //   var description = getDescription(salaryStats);
-//   var salaryXPos = xScale(salaryStats.index);
+}
 
-//   d3.select('#chart-container')
-//     .append('g')
-//       .attr({
-//         'class': 'outline circles',
-//         'fill': 'none',
-//         'stroke': BROWN + '1)',
-//         'stroke-width': 1
-//       })
-//       .selectAll('.outline .circle').data(incomeThresholds).enter()
-//       .append('circle')
-//         .attr({
-//           'class': 'outline circle',
-//           'r': function(d){return xScale(d.originalIndex)/2;},
-//           'cx': function(d){return xScale(d.originalIndex)/2 + margin.left;},
-//           'cy': chartDimension/2,
-//           'opacity': 0.25
-//         })
+function highlightThreshold(site) {
+  const thresholds = d3.selectAll('.threshold');
+  const thresholdPercentages = d3.selectAll('.threshold-percentages');
+  const thresholdText = d3.selectAll(`.threshold-text`)
+  if (site) {
+    d3.selectAll(`.threshold-${site.originalIndex}`).attr('fill', BROWN);
+    d3.selectAll(`.threshold-percentages-${site.originalIndex}`).attr('opacity', 1);
+    thresholdText.attr('opacity', d =>
+      [site.originalIndex, site.originalIndex + 1].includes(d.originalIndex) ? 1 : 0.1)
+  } else {
+    thresholds.attr('fill', 'none');
+    thresholdPercentages.attr('opacity', 0);
+    thresholdText.attr('opacity', 1)
+  }
+}
 
-//   d3.select('#chart-container')
-//     .append('circle')
-//       .attr({
-//         'class': 'salary circle',
-//         'fill': GREEN + (0.5 + 0.5 * 0.3) + ')',
-//         'r': salaryXPos/2,
-//         'cx': salaryXPos/2 + margin.left,
-//         'cy': chartDimension/2
-//       })
-
-//   d3.select('#chart-container')
-//     .append('circle')
-//       .attr({
-//         'class': 'missing salary circle',
-//         'fill': GREEN + '0.2)',
-//         'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
-//         'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
-//         'cy': chartDimension/2
-//       })
-
-//   d3.select('#chart-container')
-//     .append('rect')
-//       .attr({
-//         'class': 'cover white',
-//         'x': 0 + margin.left,
-//         'y': 0 + margin.top,
-//         'width': chartDimension - margin.left - margin.right,
-//         'height': chartDimension / 2 - margin.top,
-//         'fill': WHITE + '1)',
-//       })
-
-//   d3.select('#chart-container')
-//     .append('rect')
-//       .attr({
-//         'class': 'cover green',
-//         'x': 0 + margin.left,
-//         'y': 0 + margin.top,
-//         'width': chartDimension - margin.left - margin.right,
-//         'height': chartDimension / 2 - margin.top,
-//         'fill': GREEN + '0.2)'
-//       })
-
-//   d3.select('#chart-container')
-//     .append('rect')
-//       .attr({
-//         'class': 'cover salary',
-//         'x': 0 + margin.left,
-//         'y': 0 + margin.top,
-//         'width': salaryXPos,
-//         'height': chartDimension / 2 - margin.top,
-//         'fill': GREEN + '0.5)'
-//       })
-
-//   d3.select('#chart-container')
-//     .append('path').datum(incomeThresholds)
-//       .attr({
-//         'class': 'area outline',
-//         'd': area,
-//         'fill': WHITE + '1)'
-//       })
-
-//   var descriptions = d3.select('#chart-container')
-//     .append('g')
-//       .attr({
-//         'class': 'descriptions',
-//       })
-
-//   var percentageTextSize = calculateFontSize();
-//   descriptions
-//     .append('text')
-//       .text(description[2])
-//       .attr({
-//         'class': 'description percentage',
-//         'text-anchor': 'end',
-//         'alignment-baseline': 'after-edge',
-//         'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
-//         'font-size': percentageTextSize,
-//         'fill': ORANGE + '0.8)'
-//       })
-
-//   var textTextSize = 14;
-//   descriptions.selectAll('.description.text').data(description.slice(0,2)).enter()
-//     .append('text')
-//       .text(function(d){return d;})
-//       .attr({
-//         'class': 'description text',
-//         'font-size': textTextSize,
-//         'text-anchor': 'end',
-//         'alignment-baseline': 'after-edge',
-//         'transform': function(d, i){
-//           return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
-//         },
-//         'fill': ORANGE + '1)'
-//       })
-
-//   var flags = d3.select('#chart-container')
-//     .append('g')
-//       .attr({
-//         'class': 'flags',
-//         'stroke': BROWN + '0.25)',
-//         'fill': BROWN + '0.75)',
-//         'stroke-width': 1
-//       })
-
-//   flags
-//     .append('g')
-//       .attr({
-//         'class': 'flags lines',
-//         'stroke-width': 1
-//       })
-//       .selectAll('.flag.line').data(incomeThresholds).enter()
-//       .append('line')
-//         .attr({
-//           'class': 'flag line',
-//           'x1': function(d){return xScale(d.originalIndex) + margin.left;},
-//           'x2': function(d){return xScale(d.originalIndex) + margin.left;},
-//           'y1': 0 + margin.top,
-//           'y2': function(d){return Math.max(yScale(d.count) - 15, 0.8 * yScale(d.count));}
-//         })
-
-//   flags
-//     .append('g')
-//       .attr({
-//         'class': 'flags labels',
-//         'stroke': 'none',
-//         'font-size': 14
-//       })
-//       .selectAll('.flag.label').data(incomeThresholds).enter()
-//       .append('text')
-//         .text(function(d){return d.text;})
-//         .attr({
-//           'class': 'flag label',
-//           'dy': '0.9em',
-//           'text-anchor': 'end',
-//           'transform': function(d){return 'translate('+ (xScale(d.originalIndex) + margin.left) +',' + (0 + margin.top) + ')rotate(-90)';}
-//         })
-
-//   var yAxis = d3.svg.axis()
-//     .scale(yScale).orient('left')
-//     .ticks(4).tickFormat(d3.format('s'))
-
-//   d3.select('#chart-container')
-//     .append('g')
-//       .attr('transform', 'translate(' + margin.left + ',' + 0 + ')')
-//       .attr('class', 'y axis')
-//       .call(yAxis)
-// }
-
-// function calculateSalaryStats(userSalary){
+function calculateSalaryStats(userSalary){
 //   for (var i = 0; i < incomeThresholds.length; i++){
 //     var threshold = incomeThresholds[i];
 //     if (userSalary < threshold.upperThreshold) {
@@ -268,9 +213,9 @@ function formatCSVData(irsCsv, index){
 //     };
 //   }
 //   return {};
-// }
+}
 
-// function getDescription(salaryStats){
+function getDescription(salaryStats){
 //   var format = d3.format('$,');
 //   var percent = Math.round(salaryStats.percentage * 10000)/100;
 //   if (percent > 98){
@@ -281,15 +226,15 @@ function formatCSVData(irsCsv, index){
 //     percent = Math.round((1 - salaryStats.percentage) * 100);
 //   }
 //   return ['earned more','than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
-// }
+}
 
-// function calculateFontSize(){
+function calculateFontSize(){
 //   var chartDimensionMultiplier = chartDimension / 1000;
 //   var calculatedSize = 48 * chartDimensionMultiplier;
 //   return Math.min(calculatedSize, 48);
-// }
+}
 
-// function updateSalary(){
+function updateSalary(){
 //   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
 //   var salaryStats = calculateSalaryStats(userSalary);
 //   var description = getDescription(salaryStats);
@@ -348,66 +293,6 @@ function formatCSVData(irsCsv, index){
 //       'cy': chartDimension/2,
 //     })
 
-//   d3.selectAll('.salary.circle')
-//     .transition()
-//     .attr({
-//       'r': salaryXPos/2,
-//       'cx': salaryXPos/2 + margin.left,
-//       'cy': chartDimension/2
-//     })
-
-//   d3.selectAll('.missing.salary.circle')
-//     .transition()
-//     .attr({
-//       'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
-//       'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2,
-//       'cy': chartDimension/2
-//     })
-
-//   d3.selectAll('.cover.white')
-//     .transition()
-//     .attr({
-//       'width': chartDimension - margin.left - margin.right,
-//       'height': chartDimension / 2 - margin.top
-//     })
-
-//   d3.selectAll('.cover.green')
-//     .transition()
-//     .attr({
-//       'width': chartDimension - margin.left - margin.right,
-//       'height': chartDimension / 2 - margin.top
-//     })
-
-//   d3.selectAll('.cover.salary')
-//     .transition()
-//     .attr({
-//       'width': salaryXPos,
-//       'height': chartDimension / 2 - margin.top
-//     })
-
-//   d3.selectAll('.area.outline').datum(incomeThresholds)
-//     .transition()
-//     .attr({
-//       'd': area
-//     })
-
-//   var percentageTextSize = calculateFontSize();
-//   d3.selectAll('.description.percentage')
-//     .transition()
-//     .attr({
-//       'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')',
-//       'font-size': percentageTextSize
-//     })
-
-//   var textTextSize = 14;
-//   d3.selectAll('.description.text').data(description.slice(0,2))
-//     .transition()
-//     .attr({
-//       'font-size': textTextSize,
-//       'transform': function(d, i){
-//         return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
-//       }
-//     })
 
 //   d3.selectAll('.flag.line').data(incomeThresholds)
 //     .transition()
@@ -427,11 +312,11 @@ function formatCSVData(irsCsv, index){
 //     .scale(yScale).orient('left')
 //     .ticks(4).tickFormat(d3.format('s'))
 //   d3.selectAll('.y.axis').transition().call(yAxis)
-// }
+}
 
-// function updateWindow(){
-//   width = chartContainer.offsetWidth;
-//   height = window.innerHeight - topMargin;
+function updateWindow(){
+  width = chartContainer.offsetWidth;
+  height = window.innerHeight - topOffset;;
 
 //   chartDimension = Math.min(width, height);
 //   leftAdjust = Math.max(0, (width - chartDimension)/2);
@@ -451,4 +336,4 @@ function formatCSVData(irsCsv, index){
 //   yScale.range([chartDimension / 2, margin.top]);
 
 //   updateElements();
-// }
+}
