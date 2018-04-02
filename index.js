@@ -1,10 +1,8 @@
 const BROWN = 'RGBA(186, 184, 175, 1)';
 const DARK_BROWN = 'RGBA(134, 129, 116, 1)'
 const GREEN = 'RGBA(0, 140, 112, 1)';
-// const ORANGE = 'RGBA(255, 109, 24,';
-// const WHITE = 'RGBA(255, 255, 255,';
 
-const YEARS_WHITELIST = d3.range(2001, 2015);
+const YEARS_WHITELIST = d3.range(2002, 2015);
 const dataByYear = YEARS_WHITELIST.reduce((dataByYear, year) => ({
     ...dataByYear,
   [year]: {
@@ -19,7 +17,7 @@ const DISPLAY_YEAR = 2013;
 
 const chartContainer = document.getElementById('chart');
 const topOffset = 70;
-const margin = {top: 20 + 3, right: 70, bottom: 50 + 20 + 108, left: 70};
+const margin = {top: 20 + 3, right: 75, bottom: 50 + 20 + 108, left: 64};
 let width = chartContainer.offsetWidth;
 let height = window.innerHeight - topOffset;
 
@@ -31,18 +29,18 @@ const svg = d3.select('#chart').append('svg')
 
 const xScale = d3.scaleBand()
   .range([0, width - margin.right - margin.left])
-  .paddingInner(0.1)
-  .paddingOuter(0.1);
+  .paddingInner(0.07)
+  .paddingOuter(0.07);
 const yScale = d3.scaleLinear()
   .range([height - margin.bottom, margin.top]);
 const voronoi = d3.voronoi()
-  .x(d => xScale(d.year))
+  .x(d => xScale(d.year) + xScale.bandwidth() / 2)
   .y(d => yScale(d.cumulCount / dataByYear[d.year].totalCount))
   .extent([[0, 0], [width - margin.left, height - margin.bottom]]);
 let voronoiDiagram = null;
 
 d3.dsv(',', 'data.csv', formatCSVData).then((data) => {
-  const years = Object.keys(dataByYear)
+  const years = Object.keys(dataByYear);
   xScale.domain(years);
   yScale.domain([0, 1]);
 
@@ -154,7 +152,7 @@ function initialRender(){
     .attr('d', d => d ? 'M' + d.join('L') + 'Z' : null)
     .datum(d => d.point)
     .attr('class', 'voronoi')
-    .style('fill', 'none')
+    .attr('fill', 'none')
     .style('pointer-events', 'all')
     .on('mouseover', mouseMoveHandler)
     .on('mouseout',  mouseOutHandler);
@@ -175,10 +173,6 @@ function initialRender(){
   function mouseOutHandler() {
     highlightThreshold(null);
   }
-
-//   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
-//   var salaryStats = calculateSalaryStats(userSalary);
-//   var description = getDescription(salaryStats);
 }
 
 function highlightThreshold(site) {
@@ -197,89 +191,55 @@ function highlightThreshold(site) {
   }
 }
 
-function calculateSalaryStats(userSalary){
-//   for (var i = 0; i < incomeThresholds.length; i++){
-//     var threshold = incomeThresholds[i];
-//     if (userSalary < threshold.upperThreshold) {
-//       var factor = (userSalary - threshold.lowerThreshold)/(threshold.upperThreshold - threshold.lowerThreshold);
-//       var calculatedIndex = i + factor;
-//       var calculatedCumulCount = threshold.cumulCount - (1 - factor) * threshold.count
+const userSalaryInput = document.getElementById('usersalary');
+userSalaryInput.oninput = onInputChange;
 
-//       return {
-//           userSalary: userSalary,
-//           index: calculatedIndex,
-//           percentage: calculatedCumulCount / totalCount
-//         }
-//     };
-//   }
-//   return {};
-}
-
-function getDescription(salaryStats){
-//   var format = d3.format('$,');
-//   var percent = Math.round(salaryStats.percentage * 10000)/100;
-//   if (percent > 98){
-//     percent = Math.round((1 - salaryStats.percentage) * 10000)/100;
-//   } else if (percent > 95){
-//     percent = Math.round((1 - salaryStats.percentage) * 1000)/10;
-//   } else {
-//     percent = Math.round((1 - salaryStats.percentage) * 100);
-//   }
-//   return ['earned more','than ' + format(d3.round(salaryStats.userSalary,2)), percent + '%'];
-}
-
-function calculateFontSize(){
-//   var chartDimensionMultiplier = chartDimension / 1000;
-//   var calculatedSize = 48 * chartDimensionMultiplier;
-//   return Math.min(calculatedSize, 48);
-}
-
-function updateSalary(){
-//   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
-//   var salaryStats = calculateSalaryStats(userSalary);
+function onInputChange() {
+  const userSalary = Number(userSalaryInput.value.replace(/[^\d\.]/g,'').trim());
+  const salaryStats = calculateSalaryStats(userSalary);
+  console.log(salaryStats)
 //   var description = getDescription(salaryStats);
-//   var salaryXPos = xScale(salaryStats.index);
+}
 
-//   d3.selectAll('.salary.circle')
-//     .transition().duration(700)
-//     .attr({
-//       'r': salaryXPos/2,
-//       'cx': salaryXPos/2 + margin.left
-//     })
+function calculateSalaryStats(userSalary){
+  console.log(userSalary)
+  const dataPerYear = Object.values(dataByYear);
+  return dataPerYear.map(yearData => calculatePercentage(yearData, userSalary));
+}
 
-//   d3.selectAll('.missing.salary.circle')
-//     .transition().duration(700)
-//     .attr({
-//       'r': (chartDimension - margin.right - margin.left - salaryXPos)/2,
-//       'cx': margin.left + salaryXPos + (chartDimension - margin.right - margin.left - salaryXPos)/2
-//     })
+function calculatePercentage({incomeThresholds, totalCount}, userSalary) {
+  for (let idx = 0; idx < incomeThresholds.length; idx++) {
+    const threshold = incomeThresholds[idx];
+    if (userSalary < threshold.upperThreshold) {
+      const factor = (userSalary - threshold.lowerThreshold) / (threshold.upperThreshold - threshold.lowerThreshold);
+      const calculatedIndex = idx + factor;
+      const calculatedCumulCount = threshold.cumulCount - (1 - factor) * threshold.count
+      const percentage = calculatedCumulCount / totalCount;
+      return {
+          description: getDescription(userSalary, percentage),
+          index: calculatedIndex,
+          percentage
+        }
+    };
+  }
+  return {};
+}
 
-//   d3.selectAll('.cover.salary')
-//     .transition().duration(700)
-//     .attr({
-//       'width': salaryXPos
-//     })
+function getDescription(userSalary, percentage){
+  const format = d3.format('$,');
+  let percent = Math.round(percentage * 10000) / 100;
+  if (percent > 98){
+    percent = Math.round((1 - percentage) * 10000) / 100;
+  } else if (percent > 95){
+    percent = Math.round((1 - percentage) * 1000) / 10;
+  } else {
+    percent = Math.round((1 - percentage) * 100);
+  }
 
-//   d3.selectAll('.description.percentage')
-//     .text(description[2])
-//     .transition().duration(700)
-//     .attr({
-//       'transform': 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + typPadding) + ')'
-//     })
+  return ['earned more','than ' + d3.format(".0%")(userSalary,2), percent + '%'];
+}
 
-//   var textTextSize = 14;
-//   d3.selectAll('.description.text').data(description.slice(0,2))
-//     .text(function(d){return d;})
-//     .transition().duration(700)
-//     .attr({
-//       'font-size': textTextSize,
-//       'transform': function(d, i){
-//         return 'translate(' + (chartDimension - margin.left) + ',' + (chartDimension / 2 + (i + 1) * (textTextSize) + typPadding) + ')'
-//       }
-//     })
-// }
-
-// function updateElements(){
+function updateElements(){
 //   var userSalary = +document.getElementById('usersalary').value.replace(/[^\d\.]/g,'').trim();
 //   var salaryStats = calculateSalaryStats(userSalary);
 //   var description = getDescription(salaryStats);
@@ -335,5 +295,5 @@ function updateWindow(){
 //   xScale.range([0, chartDimension - margin.right - margin.left]);
 //   yScale.range([chartDimension / 2, margin.top]);
 
-//   updateElements();
+  updateElements();
 }
